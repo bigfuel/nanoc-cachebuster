@@ -4,6 +4,17 @@ module Nanoc3
       identifier :cache_buster
 
       def run(content, options = {})
+        
+        if @item[:extension].match(/\.(haml|html)$/)
+          dependencies = Array.new 
+          @items.each do |i|
+            if i[:extension].match(/\.(css|js|jpg|jpeg|gif|png)$/)
+              dependencies << i
+            end
+          end
+          depend_on(dependencies)
+        end
+        
         kind = options[:strategy] || (stylesheet? ? :css : :html)
         strategy = Nanoc3::Cachebuster::Strategy.for(kind , site, item)
         content.gsub(strategy.class::REGEX) do |m|
@@ -30,4 +41,3 @@ module Nanoc3
     end
   end
 end
-
