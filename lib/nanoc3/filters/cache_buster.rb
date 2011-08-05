@@ -5,10 +5,11 @@ module Nanoc3
 
       def run(content, options = {})
         
-        if @item[:extension].match(/\.(haml|html)$/)
+        # must use :force => true on compile Rule
+        if item[:extension].match(/\.(haml|html)$/)
           dependencies = Array.new 
           @items.each do |i|
-            if i[:extension].match(/\.(css|js|jpg|jpeg|gif|png)$/)
+            if i[:extension].match(/\.(sass|css|js|jpg|jpeg|gif|png)$/)
               dependencies << i
             end
           end
@@ -41,3 +42,4 @@ module Nanoc3
     end
   end
 end
+
