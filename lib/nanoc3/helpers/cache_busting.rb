@@ -27,6 +27,23 @@ module Nanoc3
       def fingerprint(filename)
         Nanoc3::Cachebuster.fingerprint_file(filename)
       end
+      
+      # This is a work in progress to get items to recompile based on depencies on
+      # other items. It is currently working but no tests have been written.
+      def add_dependencies(extensions)
+        item_extensions = extensions.join('|')
+        if item[:extension].match(/\.(#{item_extensions})$/)
+          dependent_extensions = Nanoc3::Cachebuster::FILETYPES_TO_FINGERPRINT.delete_if {|x| x = x.match(/#{item_extensions}/)}.join('|')
+          dependencies = Array.new
+          @items.each do |i|
+            if i[:extension].match(/\.(#{dependent_extensions})$/)
+              dependencies << Pathname.new(i.realpath)
+            end
+          end
+          depend_on(dependencies)
+        end
+      end
+      
     end
   end
 end

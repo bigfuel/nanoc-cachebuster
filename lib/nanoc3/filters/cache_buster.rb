@@ -2,19 +2,17 @@ module Nanoc3
   module Filters
     class CacheBuster < Nanoc3::Filter
       identifier :cache_buster
-
       def run(content, options = {})
         
-        # must use :force => true on compile Rule
-        if item[:extension].match(/\.(haml|html)$/)
-          dependencies = Array.new 
-          @items.each do |i|
-            if i[:extension].match(/\.(sass|css|js|jpg|jpeg|gif|png)$/)
-              dependencies << i
-            end
+        # This is a work in progress to get items to recompile based on depencies on
+        # other items. It is currently working but no tests have been written.
+        item_dependencies = Array.new
+        @items.each do |i|
+          if i[:extension].match(/\.(css|sass|html|haml)$/)
+            item_dependencies << Pathname.new(i.realpath)
           end
-          depend_on(dependencies)
         end
+        add_dependencies(item_dependencies)
         
         kind = options[:strategy] || (stylesheet? ? :css : :html)
         strategy = Nanoc3::Cachebuster::Strategy.for(kind , site, item)
